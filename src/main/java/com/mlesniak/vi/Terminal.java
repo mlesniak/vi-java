@@ -15,6 +15,7 @@ public class Terminal {
     public static final int LEFT = 1003;
 
     private String saved;
+    private int pushback = -1;
 
     public void enableRaw() throws IOException {
         saved = stty("-g").trim();
@@ -49,9 +50,38 @@ public class Terminal {
         }
     }
 
+    /** Reads one key; arrow escape sequences are folded into UP/DOWN/RIGHT/LEFT. EOF is -1. */
+    public int readKey() throws IOException {
+        int key = next();
+        if (key != ESC || System.in.available() == 0) {
+            return key;
+        }
+        int second = next();
+        if (second != '[') {
+            pushback = second;
+            return ESC;
+        }
+        return switch (next()) {
+            case 'A' -> UP;
+            case 'B' -> DOWN;
+            case 'C' -> RIGHT;
+            case 'D' -> LEFT;
+            default -> ESC;
+        };
+    }
+
     public void write(String s) {
         System.out.print(s);
         System.out.flush();
+    }
+
+    private int next() throws IOException {
+        if (pushback >= 0) {
+            int key = pushback;
+            pushback = -1;
+            return key;
+        }
+        return System.in.read();
     }
 
     private static String stty(String... args) throws IOException {
