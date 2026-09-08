@@ -219,6 +219,14 @@ class EditorTest {
     }
 
     @Test
+    void yyCopiesWithoutDeleting() {
+        Editor e = editor("a", "b");
+        type(e, "yyjp");
+        assertEquals(List.of("a", "b", "a"), lines(e));
+        assertCursor(e, 2, 0);
+    }
+
+    @Test
     void pWithEmptyRegisterDoesNothing() {
         Editor e = editor("a");
         type(e, "p");
