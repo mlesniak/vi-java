@@ -42,6 +42,24 @@ class BufferTest {
     }
 
     @Test
+    void splitCreatesTwoLines() {
+        Buffer buf = new Buffer(List.of("hello world"));
+        buf.split(0, 5);
+        assertEquals(2, buf.size());
+        assertEquals("hello", buf.line(0));
+        assertEquals(" world", buf.line(1));
+    }
+
+    @Test
+    void joinAppendsNextLine() {
+        Buffer buf = new Buffer(List.of("foo", "bar", "baz"));
+        buf.join(0);
+        assertEquals(2, buf.size());
+        assertEquals("foobar", buf.line(0));
+        assertEquals("baz", buf.line(1));
+    }
+
+    @Test
     void nameCanBeSet() {
         Buffer buf = new Buffer();
         buf.name("x.txt");

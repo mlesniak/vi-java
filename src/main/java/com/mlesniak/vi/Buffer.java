@@ -51,4 +51,16 @@ public class Buffer {
         lines.set(row, s.substring(0, col) + s.substring(col + 1));
         dirty = true;
     }
+
+    public void split(int row, int col) {
+        String s = lines.get(row);
+        lines.set(row, s.substring(0, col));
+        lines.add(row + 1, s.substring(col));
+        dirty = true;
+    }
+
+    public void join(int row) {
+        lines.set(row, lines.get(row) + lines.remove(row + 1));
+        dirty = true;
+    }
 }
