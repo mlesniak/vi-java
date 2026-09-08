@@ -46,6 +46,7 @@ public class Editor {
             case 'b' -> wordBackward();
             case 'd' -> pending = key;
             case 'x' -> deleteChar();
+            case 'p' -> paste();
             default -> {
             }
         }
@@ -65,6 +66,15 @@ public class Editor {
         if (!buf.line(row).isEmpty()) {
             buf.snapshot();
             buf.delete(row, col);
+        }
+    }
+
+    private void paste() {
+        if (register != null) {
+            buf.snapshot();
+            buf.insertLine(row + 1, register);
+            row++;
+            col = 0;
         }
     }
 

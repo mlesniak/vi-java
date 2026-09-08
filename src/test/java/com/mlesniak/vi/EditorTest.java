@@ -192,6 +192,17 @@ class EditorTest {
     }
 
     @Test
+    void ddDeletesLineIntoRegisterAndPPastesBelow() {
+        Editor e = editor("a", "b", "c");
+        type(e, "jdd");
+        assertEquals(List.of("a", "c"), lines(e));
+        assertCursor(e, 1, 0);
+        type(e, "p");
+        assertEquals(List.of("a", "c", "b"), lines(e));
+        assertCursor(e, 2, 0);
+    }
+
+    @Test
     void ddOnOnlyLineLeavesEmptyLine() {
         Editor e = editor("only");
         type(e, "dd");
@@ -205,5 +216,13 @@ class EditorTest {
         type(e, "jdd");
         assertEquals(List.of("a"), lines(e));
         assertCursor(e, 0, 0);
+    }
+
+    @Test
+    void pWithEmptyRegisterDoesNothing() {
+        Editor e = editor("a");
+        type(e, "p");
+        assertEquals(List.of("a"), lines(e));
+        assertEquals(false, e.buffer().undo());
     }
 }
