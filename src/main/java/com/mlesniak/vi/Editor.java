@@ -1,5 +1,7 @@
 package com.mlesniak.vi;
 
+import java.io.IOException;
+
 /** Editor state machine: modes, cursor, scrolling and key dispatch. Does no terminal IO. */
 public class Editor {
     public enum Mode {
@@ -183,7 +185,24 @@ public class Editor {
         if (line.isEmpty()) {
             return;
         }
-        status = "Not an editor command: " + line;
+        String[] parts = line.split("\\s+", 2);
+        String arg = parts.length > 1 ? parts[1] : null;
+        try {
+            switch (parts[0]) {
+                case "w" -> write(arg);
+                default -> status = "Not an editor command: " + line;
+            }
+        } catch (IOException e) {
+            status = e.getMessage();
+        }
+    }
+
+    private void write(String name) throws IOException {
+        if (name != null) {
+            buf.name(name);
+        }
+        buf.save();
+        status = "\"" + buf.name() + "\" written";
     }
 
     private void wordForward() {

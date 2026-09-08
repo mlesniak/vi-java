@@ -2,8 +2,12 @@ package com.mlesniak.vi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class EditorTest {
 
@@ -397,6 +401,17 @@ class EditorTest {
         type(e, ":\r");
         assertEquals(Editor.Mode.NORMAL, e.mode());
         assertEquals("", e.status());
+    }
+
+    @Test
+    void wWritesToNamedFile(@TempDir Path dir) throws IOException {
+        Editor e = editor("a");
+        String name = dir.resolve("f.txt").toString();
+        type(e, "x:w " + name + "\r");
+        assertEquals("\n", Files.readString(dir.resolve("f.txt")));
+        assertEquals(name, e.buffer().name());
+        assertEquals(false, e.buffer().dirty());
+        assertEquals("\"" + name + "\" written", e.status());
     }
 
     @Test
