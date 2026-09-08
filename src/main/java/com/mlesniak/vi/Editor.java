@@ -99,6 +99,11 @@ public class Editor {
                 mode = Mode.NORMAL;
                 col--;
             }
+            case Terminal.ENTER -> {
+                buf.split(row, col);
+                row++;
+                col = 0;
+            }
             case Terminal.LEFT -> col--;
             case Terminal.RIGHT -> col++;
             case Terminal.UP -> row--;

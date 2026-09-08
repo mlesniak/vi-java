@@ -226,6 +226,14 @@ class EditorTest {
     }
 
     @Test
+    void enterSplitsLineInInsertMode() {
+        Editor e = editor("hello world");
+        type(e, "wi\r" + ESC);
+        assertEquals(List.of("hello ", "world"), lines(e));
+        assertCursor(e, 1, 0);
+    }
+
+    @Test
     void insertModeAllowsCursorPastLastCharacter() {
         Editor e = editor("ab");
         type(e, "i");
@@ -244,6 +252,16 @@ class EditorTest {
         e.handleKey(1);
         e.handleKey(200);
         assertEquals("a", e.buffer().line(0));
+    }
+
+    @Test
+    void wholeInsertSessionIsOneUndoStep() {
+        Editor e = editor("");
+        type(e, "iabc\rdef" + ESC);
+        assertEquals(List.of("abc", "def"), lines(e));
+        assertEquals(true, e.buffer().undo());
+        assertEquals(List.of(""), lines(e));
+        assertEquals(false, e.buffer().undo());
     }
 
     static List<String> lines(Editor e) {
