@@ -184,6 +184,36 @@ class EditorTest {
         assertCursor(e, 0, 0);
     }
 
+    @Test
+    void iEntersInsertModeAndTypesBeforeCursor() {
+        Editor e = editor("ac");
+        type(e, "libX");
+        assertEquals(Editor.Mode.INSERT, e.mode());
+        assertEquals("abXc", e.buffer().line(0));
+        assertCursor(e, 0, 3);
+    }
+
+    @Test
+    void insertModeAllowsCursorPastLastCharacter() {
+        Editor e = editor("ab");
+        type(e, "i");
+        e.handleKey(Terminal.RIGHT);
+        e.handleKey(Terminal.RIGHT);
+        e.handleKey(Terminal.RIGHT);
+        assertCursor(e, 0, 2);
+        type(e, "c");
+        assertEquals("abc", e.buffer().line(0));
+    }
+
+    @Test
+    void nonPrintableKeysAreIgnoredInInsertMode() {
+        Editor e = editor("a");
+        type(e, "i");
+        e.handleKey(1);
+        e.handleKey(200);
+        assertEquals("a", e.buffer().line(0));
+    }
+
     static List<String> lines(Editor e) {
         List<String> out = new java.util.ArrayList<>();
         for (int i = 0; i < e.buffer().size(); i++) {

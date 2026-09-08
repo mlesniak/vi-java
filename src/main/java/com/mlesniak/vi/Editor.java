@@ -3,7 +3,7 @@ package com.mlesniak.vi;
 /** Editor state machine: modes, cursor, scrolling and key dispatch. Does no terminal IO. */
 public class Editor {
     public enum Mode {
-        NORMAL
+        NORMAL, INSERT
     }
 
     private Buffer buf;
@@ -27,6 +27,7 @@ public class Editor {
         status = "";
         switch (mode) {
             case NORMAL -> normal(key);
+            case INSERT -> insert(key);
         }
         clampCursor();
         adjustScroll();
@@ -51,6 +52,7 @@ public class Editor {
             case 'x' -> deleteChar();
             case 'p' -> paste();
             case 'u' -> undo();
+            case 'i' -> enterInsert();
             default -> {
             }
         }
@@ -67,6 +69,31 @@ public class Editor {
             register = buf.line(row);
         } else if (op == 'g' && key == 'g') {
             row = 0;
+        }
+    }
+
+    /** Entering INSERT takes one snapshot, so the whole insert session is one undo step. */
+    private void enterInsert() {
+        buf.snapshot();
+        mode = Mode.INSERT;
+    }
+
+    private void insert(int key) {
+        switch (key) {
+            case Terminal.ESC -> {
+                mode = Mode.NORMAL;
+                col--;
+            }
+            case Terminal.LEFT -> col--;
+            case Terminal.RIGHT -> col++;
+            case Terminal.UP -> row--;
+            case Terminal.DOWN -> row++;
+            default -> {
+                if (key >= 32 && key <= 126) {
+                    buf.insert(row, col, (char) key);
+                    col++;
+                }
+            }
         }
     }
 
@@ -140,7 +167,9 @@ public class Editor {
     private void clampCursor() {
         row = Math.max(0, Math.min(row, buf.size() - 1));
         int max = buf.line(row).length();
-        max = Math.max(0, max - 1);
+        if (mode != Mode.INSERT) {
+            max = Math.max(0, max - 1);
+        }
         col = Math.max(0, Math.min(col, max));
     }
 
