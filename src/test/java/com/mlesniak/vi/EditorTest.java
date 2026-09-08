@@ -117,4 +117,27 @@ class EditorTest {
         type(e, "kkkkk");
         assertEquals(0, e.scroll());
     }
+
+    @Test
+    void wMovesToNextWordStart() {
+        Editor e = editor("foo  bar baz");
+        type(e, "w");
+        assertCursor(e, 0, 5);
+        type(e, "w");
+        assertCursor(e, 0, 9);
+    }
+
+    @Test
+    void wCrossesLineBoundaries() {
+        Editor e = editor("foo", "", "  bar");
+        type(e, "w");
+        assertCursor(e, 2, 2);
+    }
+
+    @Test
+    void wAtEndOfBufferStaysOnLastCharacter() {
+        Editor e = editor("foo bar");
+        type(e, "www");
+        assertCursor(e, 0, 6);
+    }
 }

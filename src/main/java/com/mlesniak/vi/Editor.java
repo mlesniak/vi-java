@@ -36,9 +36,32 @@ public class Editor {
             case 'k', Terminal.UP -> row--;
             case '0' -> col = 0;
             case '$' -> col = buf.line(row).length();
+            case 'w' -> wordForward();
             default -> {
             }
         }
+    }
+
+    private void wordForward() {
+        int r = row;
+        int c = col;
+        String s = buf.line(r);
+        while (c < s.length() && !Character.isWhitespace(s.charAt(c))) {
+            c++;
+        }
+        while (true) {
+            while (c < s.length() && Character.isWhitespace(s.charAt(c))) {
+                c++;
+            }
+            if (c < s.length() || r == buf.size() - 1) {
+                break;
+            }
+            r++;
+            c = 0;
+            s = buf.line(r);
+        }
+        row = r;
+        col = c;
     }
 
     /** Keeps row inside the buffer and col on a character (or one past the end in INSERT). */
