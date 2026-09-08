@@ -63,4 +63,18 @@ public class Buffer {
         lines.set(row, lines.get(row) + lines.remove(row + 1));
         dirty = true;
     }
+
+    public void insertLine(int row, String s) {
+        lines.add(row, s);
+        dirty = true;
+    }
+
+    public String deleteLine(int row) {
+        String s = lines.remove(row);
+        if (lines.isEmpty()) {
+            lines.add("");
+        }
+        dirty = true;
+        return s;
+    }
 }

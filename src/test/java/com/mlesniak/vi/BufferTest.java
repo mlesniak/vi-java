@@ -60,6 +60,29 @@ class BufferTest {
     }
 
     @Test
+    void insertLineAddsLineAtIndex() {
+        Buffer buf = new Buffer(List.of("a", "c"));
+        buf.insertLine(1, "b");
+        assertEquals(List.of("a", "b", "c"), List.of(buf.line(0), buf.line(1), buf.line(2)));
+    }
+
+    @Test
+    void deleteLineReturnsRemovedLine() {
+        Buffer buf = new Buffer(List.of("a", "b"));
+        assertEquals("a", buf.deleteLine(0));
+        assertEquals(1, buf.size());
+        assertEquals("b", buf.line(0));
+    }
+
+    @Test
+    void deletingLastLineLeavesOneEmptyLine() {
+        Buffer buf = new Buffer(List.of("only"));
+        buf.deleteLine(0);
+        assertEquals(1, buf.size());
+        assertEquals("", buf.line(0));
+    }
+
+    @Test
     void nameCanBeSet() {
         Buffer buf = new Buffer();
         buf.name("x.txt");
