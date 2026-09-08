@@ -39,4 +39,16 @@ public class Buffer {
     public boolean dirty() {
         return dirty;
     }
+
+    public void insert(int row, int col, char c) {
+        String s = lines.get(row);
+        lines.set(row, s.substring(0, col) + c + s.substring(col));
+        dirty = true;
+    }
+
+    public void delete(int row, int col) {
+        String s = lines.get(row);
+        lines.set(row, s.substring(0, col) + s.substring(col + 1));
+        dirty = true;
+    }
 }
