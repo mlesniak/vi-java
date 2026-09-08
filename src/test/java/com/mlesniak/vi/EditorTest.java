@@ -234,6 +234,19 @@ class EditorTest {
     }
 
     @Test
+    void backspaceDeletesLeftAndJoinsAtColumnZero() {
+        Editor e = editor("ab", "cd");
+        type(e, "jla");
+        e.handleKey(Terminal.BACKSPACE);
+        assertEquals("c", e.buffer().line(1));
+        e.handleKey(8);
+        assertEquals("", e.buffer().line(1));
+        e.handleKey(Terminal.BACKSPACE);
+        assertEquals(List.of("ab"), lines(e));
+        assertCursor(e, 0, 2);
+    }
+
+    @Test
     void insertModeAllowsCursorPastLastCharacter() {
         Editor e = editor("ab");
         type(e, "i");

@@ -104,6 +104,7 @@ public class Editor {
                 row++;
                 col = 0;
             }
+            case Terminal.BACKSPACE, 8 -> backspace();
             case Terminal.LEFT -> col--;
             case Terminal.RIGHT -> col++;
             case Terminal.UP -> row--;
@@ -114,6 +115,17 @@ public class Editor {
                     col++;
                 }
             }
+        }
+    }
+
+    private void backspace() {
+        if (col > 0) {
+            col--;
+            buf.delete(row, col);
+        } else if (row > 0) {
+            col = buf.line(row - 1).length();
+            buf.join(row - 1);
+            row--;
         }
     }
 
