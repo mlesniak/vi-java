@@ -15,6 +15,7 @@ public class Editor {
     private final int cols;
     private int pending;
     private String register;
+    private String status = "";
 
     public Editor(Buffer buf, int rows, int cols) {
         this.buf = buf;
@@ -23,6 +24,7 @@ public class Editor {
     }
 
     public void handleKey(int key) {
+        status = "";
         switch (mode) {
             case NORMAL -> normal(key);
         }
@@ -48,6 +50,7 @@ public class Editor {
             case 'd', 'y', 'g' -> pending = key;
             case 'x' -> deleteChar();
             case 'p' -> paste();
+            case 'u' -> undo();
             default -> {
             }
         }
@@ -80,6 +83,12 @@ public class Editor {
             buf.insertLine(row + 1, register);
             row++;
             col = 0;
+        }
+    }
+
+    private void undo() {
+        if (!buf.undo()) {
+            status = "Already at oldest change";
         }
     }
 
@@ -166,6 +175,10 @@ public class Editor {
 
     public int cols() {
         return cols;
+    }
+
+    public String status() {
+        return status;
     }
 
     public Buffer buffer() {

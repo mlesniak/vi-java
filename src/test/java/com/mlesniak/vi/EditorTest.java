@@ -253,4 +253,28 @@ class EditorTest {
         assertEquals(List.of("a"), lines(e));
         assertEquals(false, e.buffer().undo());
     }
+
+    @Test
+    void uUndoesLastChange() {
+        Editor e = editor("abc");
+        type(e, "x");
+        type(e, "dd");
+        assertEquals(List.of(""), lines(e));
+        type(e, "u");
+        assertEquals(List.of("bc"), lines(e));
+        type(e, "u");
+        assertEquals(List.of("abc"), lines(e));
+        assertEquals("", e.status());
+        type(e, "u");
+        assertEquals("Already at oldest change", e.status());
+    }
+
+    @Test
+    void undoClampsCursor() {
+        Editor e = editor("a", "b");
+        type(e, "jddu");
+        assertEquals(List.of("a", "b"), lines(e));
+        type(e, "G");
+        assertCursor(e, 1, 0);
+    }
 }
