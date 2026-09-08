@@ -53,6 +53,10 @@ public class Editor {
             case 'p' -> paste();
             case 'u' -> undo();
             case 'i' -> enterInsert();
+            case 'a' -> {
+                enterInsert();
+                col++;
+            }
             default -> {
             }
         }

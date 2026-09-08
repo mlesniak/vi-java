@@ -194,6 +194,27 @@ class EditorTest {
     }
 
     @Test
+    void escLeavesInsertAndMovesCursorLeft() {
+        Editor e = editor("ab");
+        type(e, "ix" + ESC);
+        assertEquals(Editor.Mode.NORMAL, e.mode());
+        assertCursor(e, 0, 0);
+        type(e, "$a!" + ESC);
+        assertEquals("xab!", e.buffer().line(0));
+        assertCursor(e, 0, 3);
+    }
+
+    @Test
+    void aAppendsAfterCursorEvenOnEmptyLine() {
+        Editor e = editor("");
+        type(e, "ax" + ESC);
+        assertEquals("x", e.buffer().line(0));
+        Editor e2 = editor("ab");
+        type(e2, "aX" + ESC);
+        assertEquals("aXb", e2.buffer().line(0));
+    }
+
+    @Test
     void insertModeAllowsCursorPastLastCharacter() {
         Editor e = editor("ab");
         type(e, "i");
