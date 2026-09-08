@@ -52,6 +52,21 @@ class ScreenTest {
     }
 
     @Test
+    void statusLineShowsNameDirtyModeAndPosition() {
+        Editor e = editor("abc");
+        String[] rows = rows(Screen.render(e));
+        assertTrue(rows[3].startsWith("[No Name]  1,1" + ESC + "[K"), rows[3]);
+        e.buffer().name("f.txt");
+        e.handleKey('l');
+        e.handleKey('i');
+        rows = rows(Screen.render(e));
+        assertTrue(rows[3].startsWith("f.txt  -- INSERT --  1,2" + ESC + "[K"), rows[3]);
+        e.handleKey('x');
+        rows = rows(Screen.render(e));
+        assertTrue(rows[3].startsWith("f.txt [+]  -- INSERT --  1,3" + ESC + "[K"), rows[3]);
+    }
+
+    @Test
     void cursorPositionIsOneBasedAndScrollAware() {
         Editor e = editor("1", "2", "3", "4", "5");
         assertTrue(Screen.render(e).endsWith(ESC + "[1;1H" + ESC + "[?25h"));

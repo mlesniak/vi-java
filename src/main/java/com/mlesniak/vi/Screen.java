@@ -16,10 +16,21 @@ public final class Screen {
             sb.append(line, 0, Math.min(line.length(), e.cols()));
             sb.append(CSI).append("K\r\n");
         }
+        String bottom = bottomLine(e);
+        sb.append(bottom, 0, Math.min(bottom.length(), e.cols() - 1));
+        sb.append(CSI).append('K');
         int cy = e.row() - e.scroll() + 1;
         int cx = Math.min(e.col(), e.cols() - 1) + 1;
         sb.append(CSI).append(cy).append(';').append(cx).append('H');
         sb.append(CSI).append("?25h");
         return sb.toString();
+    }
+
+    private static String bottomLine(Editor e) {
+        Buffer buf = e.buffer();
+        String name = buf.name() == null ? "[No Name]" : buf.name();
+        String flag = buf.dirty() ? " [+]" : "";
+        String mode = e.mode() == Editor.Mode.INSERT ? "  -- INSERT --" : "";
+        return name + flag + mode + "  " + (e.row() + 1) + "," + (e.col() + 1);
     }
 }
