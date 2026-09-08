@@ -27,6 +27,9 @@ public final class Screen {
     }
 
     private static String bottomLine(Editor e) {
+        if (!e.status().isEmpty()) {
+            return e.status();
+        }
         Buffer buf = e.buffer();
         String name = buf.name() == null ? "[No Name]" : buf.name();
         String flag = buf.dirty() ? " [+]" : "";

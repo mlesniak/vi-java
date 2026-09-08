@@ -67,6 +67,16 @@ class ScreenTest {
     }
 
     @Test
+    void statusMessageReplacesStatusLine() {
+        Editor e = editor("a");
+        for (char c : ":zz\r".toCharArray()) {
+            e.handleKey(c);
+        }
+        String[] rows = rows(Screen.render(e));
+        assertTrue(rows[3].startsWith("Not an editor command: zz" + ESC + "[K"), rows[3]);
+    }
+
+    @Test
     void cursorPositionIsOneBasedAndScrollAware() {
         Editor e = editor("1", "2", "3", "4", "5");
         assertTrue(Screen.render(e).endsWith(ESC + "[1;1H" + ESC + "[?25h"));
