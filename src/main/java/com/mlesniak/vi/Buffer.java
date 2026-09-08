@@ -34,6 +34,15 @@ public class Buffer {
         return buf;
     }
 
+    public void save() throws IOException {
+        if (name == null) {
+            throw new IOException("No file name");
+        }
+        String text = String.join("\n", lines) + "\n";
+        Files.writeString(Path.of(name), text, StandardCharsets.UTF_8);
+        dirty = false;
+    }
+
     public String line(int row) {
         return lines.get(row);
     }

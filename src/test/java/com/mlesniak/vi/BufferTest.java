@@ -113,4 +113,21 @@ class BufferTest {
         assertEquals("", buf.line(0));
         assertEquals(name, buf.name());
     }
+
+    @Test
+    void saveWritesLinesWithTrailingNewlineAndClearsDirty(@TempDir Path dir) throws IOException {
+        Buffer buf = new Buffer(List.of("a", "b"));
+        buf.name(dir.resolve("out.txt").toString());
+        buf.insert(0, 1, "x".charAt(0));
+        buf.save();
+        assertEquals("ax\nb\n", Files.readString(dir.resolve("out.txt")));
+        assertFalse(buf.dirty());
+    }
+
+    @Test
+    void saveWithoutNameThrows() {
+        Buffer buf = new Buffer();
+        IOException e = org.junit.jupiter.api.Assertions.assertThrows(IOException.class, buf::save);
+        assertEquals("No file name", e.getMessage());
+    }
 }
