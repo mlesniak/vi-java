@@ -44,7 +44,8 @@ public class Editor {
             case '$' -> col = buf.line(row).length();
             case 'w' -> wordForward();
             case 'b' -> wordBackward();
-            case 'd', 'y' -> pending = key;
+            case 'G' -> row = buf.size() - 1;
+            case 'd', 'y', 'g' -> pending = key;
             case 'x' -> deleteChar();
             case 'p' -> paste();
             default -> {
@@ -52,7 +53,7 @@ public class Editor {
         }
     }
 
-    /** Second key of a two-key command (dd, yy). Any other combination is dropped. */
+    /** Second key of a two-key command (dd, yy, gg). Any other combination is dropped. */
     private void pendingKey(int key) {
         int op = pending;
         pending = 0;
@@ -61,6 +62,8 @@ public class Editor {
             register = buf.deleteLine(row);
         } else if (op == 'y' && key == 'y') {
             register = buf.line(row);
+        } else if (op == 'g' && key == 'g') {
+            row = 0;
         }
     }
 

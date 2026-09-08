@@ -164,6 +164,26 @@ class EditorTest {
         assertCursor(e, 0, 0);
     }
 
+    @Test
+    void ggAndGJumpToFirstAndLastLine() {
+        Editor e = editor("a", "b", "c");
+        type(e, "G");
+        assertCursor(e, 2, 0);
+        type(e, "gg");
+        assertCursor(e, 0, 0);
+    }
+
+    @Test
+    void pendingKeyIsCancelledByOtherKey() {
+        Editor e = editor("a", "b", "c");
+        type(e, "G");
+        type(e, "gx");
+        assertCursor(e, 2, 0);
+        assertEquals("c", e.buffer().line(2));
+        type(e, "gg");
+        assertCursor(e, 0, 0);
+    }
+
     static List<String> lines(Editor e) {
         List<String> out = new java.util.ArrayList<>();
         for (int i = 0; i < e.buffer().size(); i++) {
