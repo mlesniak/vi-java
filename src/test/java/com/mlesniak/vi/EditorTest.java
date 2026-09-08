@@ -163,4 +163,31 @@ class EditorTest {
         type(e, "b");
         assertCursor(e, 0, 0);
     }
+
+    static List<String> lines(Editor e) {
+        List<String> out = new java.util.ArrayList<>();
+        for (int i = 0; i < e.buffer().size(); i++) {
+            out.add(e.buffer().line(i));
+        }
+        return out;
+    }
+
+    @Test
+    void xDeletesCharacterUnderCursor() {
+        Editor e = editor("abc");
+        type(e, "lx");
+        assertEquals("ac", e.buffer().line(0));
+        assertCursor(e, 0, 1);
+        type(e, "x");
+        assertEquals("a", e.buffer().line(0));
+        assertCursor(e, 0, 0);
+    }
+
+    @Test
+    void xOnEmptyLineDoesNothing() {
+        Editor e = editor("");
+        type(e, "x");
+        assertEquals("", e.buffer().line(0));
+        assertEquals(false, e.buffer().undo());
+    }
 }

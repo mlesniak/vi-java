@@ -38,8 +38,16 @@ public class Editor {
             case '$' -> col = buf.line(row).length();
             case 'w' -> wordForward();
             case 'b' -> wordBackward();
+            case 'x' -> deleteChar();
             default -> {
             }
+        }
+    }
+
+    private void deleteChar() {
+        if (!buf.line(row).isEmpty()) {
+            buf.snapshot();
+            buf.delete(row, col);
         }
     }
 
