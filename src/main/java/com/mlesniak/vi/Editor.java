@@ -197,6 +197,7 @@ public class Editor {
                     write(arg);
                     quit(false);
                 }
+                case "e" -> edit(arg);
                 default -> status = "Not an editor command: " + line;
             }
         } catch (IOException e) {
@@ -218,6 +219,20 @@ public class Editor {
         } else {
             running = false;
         }
+    }
+
+    private void edit(String name) throws IOException {
+        if (name == null) {
+            throw new IOException("No file name");
+        }
+        if (buf.dirty()) {
+            status = "No write since last change (add ! to override)";
+            return;
+        }
+        buf = Buffer.load(name);
+        row = 0;
+        col = 0;
+        scroll = 0;
     }
 
     private void wordForward() {

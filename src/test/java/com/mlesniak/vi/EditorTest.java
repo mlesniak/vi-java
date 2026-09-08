@@ -465,6 +465,33 @@ class EditorTest {
     }
 
     @Test
+    void eLoadsFileIntoCleanBuffer(@TempDir Path dir) throws IOException {
+        Path file = dir.resolve("g.txt");
+        Files.writeString(file, "x\ny\n");
+        Editor e = editor("a", "b", "c");
+        type(e, "G:e " + file + "\r");
+        assertEquals(List.of("x", "y"), lines(e));
+        assertCursor(e, 0, 0);
+        assertEquals(0, e.scroll());
+        assertEquals(file.toString(), e.buffer().name());
+    }
+
+    @Test
+    void eRefusesDirtyBuffer(@TempDir Path dir) {
+        Editor e = editor("a");
+        type(e, "x:e " + dir.resolve("g.txt") + "\r");
+        assertEquals("No write since last change (add ! to override)", e.status());
+        assertEquals(List.of(""), lines(e));
+    }
+
+    @Test
+    void eWithoutNameShowsError() {
+        Editor e = editor("a");
+        type(e, ":e\r");
+        assertEquals("No file name", e.status());
+    }
+
+    @Test
     void unknownCommandShowsError() {
         Editor e = editor("a");
         type(e, ":foo bar\r");
