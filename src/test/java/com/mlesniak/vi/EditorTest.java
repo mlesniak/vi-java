@@ -72,6 +72,24 @@ class EditorTest {
     }
 
     @Test
+    void normalModeCursorStaysOnLastCharacter() {
+        Editor e = editor("abcd", "x");
+        type(e, "$");
+        assertCursor(e, 0, 3);
+        type(e, "j");
+        assertCursor(e, 1, 0);
+    }
+
+    @Test
+    void zeroAndDollarJumpWithinLine() {
+        Editor e = editor("hello");
+        type(e, "$");
+        assertCursor(e, 0, 4);
+        type(e, "0");
+        assertCursor(e, 0, 0);
+    }
+
+    @Test
     void emptyLineKeepsColumnZero() {
         Editor e = editor("");
         type(e, "l$");

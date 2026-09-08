@@ -32,6 +32,8 @@ public class Editor {
             case 'l', Terminal.RIGHT -> col++;
             case 'j', Terminal.DOWN -> row++;
             case 'k', Terminal.UP -> row--;
+            case '0' -> col = 0;
+            case '$' -> col = buf.line(row).length();
             default -> {
             }
         }
