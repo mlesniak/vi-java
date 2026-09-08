@@ -190,4 +190,20 @@ class EditorTest {
         assertEquals("", e.buffer().line(0));
         assertEquals(false, e.buffer().undo());
     }
+
+    @Test
+    void ddOnOnlyLineLeavesEmptyLine() {
+        Editor e = editor("only");
+        type(e, "dd");
+        assertEquals(List.of(""), lines(e));
+        assertCursor(e, 0, 0);
+    }
+
+    @Test
+    void ddOnLastLineMovesCursorUp() {
+        Editor e = editor("a", "b");
+        type(e, "jdd");
+        assertEquals(List.of("a"), lines(e));
+        assertCursor(e, 0, 0);
+    }
 }

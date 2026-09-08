@@ -13,6 +13,8 @@ public class Editor {
     private int scroll;
     private final int rows;
     private final int cols;
+    private int pending;
+    private String register;
 
     public Editor(Buffer buf, int rows, int cols) {
         this.buf = buf;
@@ -29,6 +31,10 @@ public class Editor {
     }
 
     private void normal(int key) {
+        if (pending != 0) {
+            pendingKey(key);
+            return;
+        }
         switch (key) {
             case 'h', Terminal.LEFT -> col--;
             case 'l', Terminal.RIGHT -> col++;
@@ -38,9 +44,20 @@ public class Editor {
             case '$' -> col = buf.line(row).length();
             case 'w' -> wordForward();
             case 'b' -> wordBackward();
+            case 'd' -> pending = key;
             case 'x' -> deleteChar();
             default -> {
             }
+        }
+    }
+
+    /** Second key of a two-key command (dd). Any other combination is dropped. */
+    private void pendingKey(int key) {
+        int op = pending;
+        pending = 0;
+        if (op == 'd' && key == 'd') {
+            buf.snapshot();
+            register = buf.deleteLine(row);
         }
     }
 
