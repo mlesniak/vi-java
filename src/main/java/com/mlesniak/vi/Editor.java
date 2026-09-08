@@ -57,6 +57,17 @@ public class Editor {
                 enterInsert();
                 col++;
             }
+            case 'o' -> {
+                enterInsert();
+                buf.insertLine(row + 1, "");
+                row++;
+                col = 0;
+            }
+            case 'O' -> {
+                enterInsert();
+                buf.insertLine(row, "");
+                col = 0;
+            }
             default -> {
             }
         }

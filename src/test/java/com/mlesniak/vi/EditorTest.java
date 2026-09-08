@@ -215,6 +215,17 @@ class EditorTest {
     }
 
     @Test
+    void oOpensLineBelowAndOOpensLineAbove() {
+        Editor e = editor("a", "c");
+        type(e, "ob" + ESC);
+        assertEquals(List.of("a", "b", "c"), lines(e));
+        assertCursor(e, 1, 0);
+        type(e, "OX" + ESC);
+        assertEquals(List.of("a", "X", "b", "c"), lines(e));
+        assertCursor(e, 1, 0);
+    }
+
+    @Test
     void insertModeAllowsCursorPastLastCharacter() {
         Editor e = editor("ab");
         type(e, "i");
