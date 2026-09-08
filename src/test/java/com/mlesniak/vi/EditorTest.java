@@ -384,6 +384,14 @@ class EditorTest {
     }
 
     @Test
+    void escLeavesCommandMode() {
+        Editor e = editor("a");
+        type(e, ":w" + ESC);
+        assertEquals(Editor.Mode.NORMAL, e.mode());
+        assertEquals(true, e.running());
+    }
+
+    @Test
     void backspaceEditsCommandAndLeavesWhenEmpty() {
         Editor e = editor("a");
         type(e, ":ab");
@@ -404,6 +412,23 @@ class EditorTest {
     }
 
     @Test
+    void qQuitsCleanBuffer() {
+        Editor e = editor("a");
+        type(e, ":q\r");
+        assertEquals(false, e.running());
+    }
+
+    @Test
+    void qRefusesDirtyBufferAndQBangForces() {
+        Editor e = editor("a");
+        type(e, "x:q\r");
+        assertEquals(true, e.running());
+        assertEquals("No write since last change (add ! to override)", e.status());
+        type(e, ":q!\r");
+        assertEquals(false, e.running());
+    }
+
+    @Test
     void wWritesToNamedFile(@TempDir Path dir) throws IOException {
         Editor e = editor("a");
         String name = dir.resolve("f.txt").toString();
@@ -412,6 +437,14 @@ class EditorTest {
         assertEquals(name, e.buffer().name());
         assertEquals(false, e.buffer().dirty());
         assertEquals("\"" + name + "\" written", e.status());
+    }
+
+    @Test
+    void wWithoutNameShowsError() {
+        Editor e = editor("a");
+        type(e, ":w\r");
+        assertEquals("No file name", e.status());
+        assertEquals(true, e.running());
     }
 
     @Test
@@ -429,5 +462,13 @@ class EditorTest {
         assertEquals("Not an editor command: foo", e.status());
         type(e, "l");
         assertEquals("", e.status());
+    }
+
+    @Test
+    void statusIsEmptyInitially() {
+        Editor e = editor("a");
+        assertEquals("", e.status());
+        assertEquals("", e.cmd());
+        assertEquals(true, e.running());
     }
 }

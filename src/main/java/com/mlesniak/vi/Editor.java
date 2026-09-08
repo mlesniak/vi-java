@@ -19,6 +19,7 @@ public class Editor {
     private String register;
     private final StringBuilder cmd = new StringBuilder();
     private String status = "";
+    private boolean running = true;
 
     public Editor(Buffer buf, int rows, int cols) {
         this.buf = buf;
@@ -190,6 +191,8 @@ public class Editor {
         try {
             switch (parts[0]) {
                 case "w" -> write(arg);
+                case "q" -> quit(false);
+                case "q!" -> quit(true);
                 default -> status = "Not an editor command: " + line;
             }
         } catch (IOException e) {
@@ -203,6 +206,14 @@ public class Editor {
         }
         buf.save();
         status = "\"" + buf.name() + "\" written";
+    }
+
+    private void quit(boolean force) {
+        if (buf.dirty() && !force) {
+            status = "No write since last change (add ! to override)";
+        } else {
+            running = false;
+        }
     }
 
     private void wordForward() {
@@ -302,5 +313,9 @@ public class Editor {
 
     public Buffer buffer() {
         return buf;
+    }
+
+    public boolean running() {
+        return running;
     }
 }
