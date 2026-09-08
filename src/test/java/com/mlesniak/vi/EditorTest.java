@@ -140,4 +140,27 @@ class EditorTest {
         type(e, "www");
         assertCursor(e, 0, 6);
     }
+
+    @Test
+    void bMovesToPreviousWordStart() {
+        Editor e = editor("foo bar");
+        type(e, "$b");
+        assertCursor(e, 0, 4);
+        type(e, "b");
+        assertCursor(e, 0, 0);
+    }
+
+    @Test
+    void bFromWordStartCrossesLineBoundaries() {
+        Editor e = editor("foo", "", "bar");
+        type(e, "jjb");
+        assertCursor(e, 0, 0);
+    }
+
+    @Test
+    void bAtStartOfBufferStays() {
+        Editor e = editor("foo");
+        type(e, "b");
+        assertCursor(e, 0, 0);
+    }
 }

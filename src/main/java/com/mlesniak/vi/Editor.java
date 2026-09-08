@@ -37,6 +37,7 @@ public class Editor {
             case '0' -> col = 0;
             case '$' -> col = buf.line(row).length();
             case 'w' -> wordForward();
+            case 'b' -> wordBackward();
             default -> {
             }
         }
@@ -59,6 +60,28 @@ public class Editor {
             r++;
             c = 0;
             s = buf.line(r);
+        }
+        row = r;
+        col = c;
+    }
+
+    private void wordBackward() {
+        int r = row;
+        int c = col;
+        while (true) {
+            String s = buf.line(r);
+            while (c > 0 && Character.isWhitespace(s.charAt(c - 1))) {
+                c--;
+            }
+            if (c > 0 || r == 0) {
+                break;
+            }
+            r--;
+            c = buf.line(r).length();
+        }
+        String s = buf.line(r);
+        while (c > 0 && !Character.isWhitespace(s.charAt(c - 1))) {
+            c--;
         }
         row = r;
         col = c;
