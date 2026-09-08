@@ -370,4 +370,49 @@ class EditorTest {
         type(e, "G");
         assertCursor(e, 1, 0);
     }
+
+    @Test
+    void colonEntersCommandModeAndCollectsText() {
+        Editor e = editor("a");
+        type(e, ":wq");
+        assertEquals(Editor.Mode.COMMAND, e.mode());
+        assertEquals("wq", e.cmd());
+    }
+
+    @Test
+    void backspaceEditsCommandAndLeavesWhenEmpty() {
+        Editor e = editor("a");
+        type(e, ":ab");
+        e.handleKey(Terminal.BACKSPACE);
+        assertEquals("a", e.cmd());
+        e.handleKey(8);
+        assertEquals(Editor.Mode.COMMAND, e.mode());
+        e.handleKey(Terminal.BACKSPACE);
+        assertEquals(Editor.Mode.NORMAL, e.mode());
+    }
+
+    @Test
+    void emptyCommandJustReturnsToNormal() {
+        Editor e = editor("a");
+        type(e, ":\r");
+        assertEquals(Editor.Mode.NORMAL, e.mode());
+        assertEquals("", e.status());
+    }
+
+    @Test
+    void unknownCommandShowsError() {
+        Editor e = editor("a");
+        type(e, ":foo bar\r");
+        assertEquals("Not an editor command: foo bar", e.status());
+        assertEquals(Editor.Mode.NORMAL, e.mode());
+    }
+
+    @Test
+    void statusIsClearedOnNextKey() {
+        Editor e = editor("a");
+        type(e, ":foo\r");
+        assertEquals("Not an editor command: foo", e.status());
+        type(e, "l");
+        assertEquals("", e.status());
+    }
 }

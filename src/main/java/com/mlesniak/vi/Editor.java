@@ -3,7 +3,7 @@ package com.mlesniak.vi;
 /** Editor state machine: modes, cursor, scrolling and key dispatch. Does no terminal IO. */
 public class Editor {
     public enum Mode {
-        NORMAL, INSERT
+        NORMAL, INSERT, COMMAND
     }
 
     private Buffer buf;
@@ -15,6 +15,7 @@ public class Editor {
     private final int cols;
     private int pending;
     private String register;
+    private final StringBuilder cmd = new StringBuilder();
     private String status = "";
 
     public Editor(Buffer buf, int rows, int cols) {
@@ -28,6 +29,7 @@ public class Editor {
         switch (mode) {
             case NORMAL -> normal(key);
             case INSERT -> insert(key);
+            case COMMAND -> command(key);
         }
         clampCursor();
         adjustScroll();
@@ -67,6 +69,10 @@ public class Editor {
                 enterInsert();
                 buf.insertLine(row, "");
                 col = 0;
+            }
+            case ':' -> {
+                mode = Mode.COMMAND;
+                cmd.setLength(0);
             }
             default -> {
             }
@@ -149,6 +155,35 @@ public class Editor {
         if (!buf.undo()) {
             status = "Already at oldest change";
         }
+    }
+
+    private void command(int key) {
+        switch (key) {
+            case Terminal.ESC -> mode = Mode.NORMAL;
+            case Terminal.ENTER -> {
+                mode = Mode.NORMAL;
+                execute(cmd.toString().trim());
+            }
+            case Terminal.BACKSPACE, 8 -> {
+                if (cmd.isEmpty()) {
+                    mode = Mode.NORMAL;
+                } else {
+                    cmd.setLength(cmd.length() - 1);
+                }
+            }
+            default -> {
+                if (key >= 32 && key <= 126) {
+                    cmd.append((char) key);
+                }
+            }
+        }
+    }
+
+    private void execute(String line) {
+        if (line.isEmpty()) {
+            return;
+        }
+        status = "Not an editor command: " + line;
     }
 
     private void wordForward() {
@@ -240,6 +275,10 @@ public class Editor {
 
     public String status() {
         return status;
+    }
+
+    public String cmd() {
+        return cmd.toString();
     }
 
     public Buffer buffer() {
