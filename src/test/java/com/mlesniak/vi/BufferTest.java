@@ -5,8 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class BufferTest {
 
@@ -87,5 +91,26 @@ class BufferTest {
         Buffer buf = new Buffer();
         buf.name("x.txt");
         assertEquals("x.txt", buf.name());
+    }
+
+    @Test
+    void loadReadsExistingFile(@TempDir Path dir) throws IOException {
+        Path file = dir.resolve("in.txt");
+        Files.writeString(file, "one\ntwo\n");
+        Buffer buf = Buffer.load(file.toString());
+        assertEquals(2, buf.size());
+        assertEquals("one", buf.line(0));
+        assertEquals("two", buf.line(1));
+        assertEquals(file.toString(), buf.name());
+        assertFalse(buf.dirty());
+    }
+
+    @Test
+    void loadMissingFileGivesEmptyNamedBuffer(@TempDir Path dir) throws IOException {
+        String name = dir.resolve("missing.txt").toString();
+        Buffer buf = Buffer.load(name);
+        assertEquals(1, buf.size());
+        assertEquals("", buf.line(0));
+        assertEquals(name, buf.name());
     }
 }

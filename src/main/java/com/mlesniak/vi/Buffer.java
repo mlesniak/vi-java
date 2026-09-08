@@ -1,5 +1,9 @@
 package com.mlesniak.vi;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +22,16 @@ public class Buffer {
         if (lines.isEmpty()) {
             lines.add("");
         }
+    }
+
+    public static Buffer load(String name) throws IOException {
+        Path path = Path.of(name);
+        List<String> read = Files.exists(path)
+                ? Files.readAllLines(path, StandardCharsets.UTF_8)
+                : List.of();
+        Buffer buf = new Buffer(read);
+        buf.name = name;
+        return buf;
     }
 
     public String line(int row) {
