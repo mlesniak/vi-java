@@ -448,6 +448,23 @@ class EditorTest {
     }
 
     @Test
+    void wqWritesAndQuits(@TempDir Path dir) throws IOException {
+        Editor e = editor("a");
+        String name = dir.resolve("f.txt").toString();
+        type(e, "ib" + ESC + ":wq " + name + "\r");
+        assertEquals("ba\n", Files.readString(dir.resolve("f.txt")));
+        assertEquals(false, e.running());
+    }
+
+    @Test
+    void wqWithoutNameDoesNotQuit() {
+        Editor e = editor("a");
+        type(e, ":wq\r");
+        assertEquals("No file name", e.status());
+        assertEquals(true, e.running());
+    }
+
+    @Test
     void unknownCommandShowsError() {
         Editor e = editor("a");
         type(e, ":foo bar\r");

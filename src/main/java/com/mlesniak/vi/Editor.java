@@ -193,6 +193,10 @@ public class Editor {
                 case "w" -> write(arg);
                 case "q" -> quit(false);
                 case "q!" -> quit(true);
+                case "wq" -> {
+                    write(arg);
+                    quit(false);
+                }
                 default -> status = "Not an editor command: " + line;
             }
         } catch (IOException e) {
