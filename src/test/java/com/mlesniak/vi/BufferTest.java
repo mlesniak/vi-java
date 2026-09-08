@@ -130,4 +130,34 @@ class BufferTest {
         IOException e = org.junit.jupiter.api.Assertions.assertThrows(IOException.class, buf::save);
         assertEquals("No file name", e.getMessage());
     }
+
+    @Test
+    void undoRestoresSnapshot() {
+        Buffer buf = new Buffer(List.of("abc"));
+        buf.snapshot();
+        buf.delete(0, 0);
+        assertEquals("bc", buf.line(0));
+        assertTrue(buf.undo());
+        assertEquals("abc", buf.line(0));
+    }
+
+    @Test
+    void undoWithoutSnapshotReturnsFalse() {
+        Buffer buf = new Buffer();
+        assertFalse(buf.undo());
+    }
+
+    @Test
+    void snapshotIsIndependentOfLaterChanges() {
+        Buffer buf = new Buffer(List.of("a"));
+        buf.snapshot();
+        buf.insertLine(1, "b");
+        buf.snapshot();
+        buf.insertLine(2, "c");
+        assertTrue(buf.undo());
+        assertEquals(2, buf.size());
+        assertTrue(buf.undo());
+        assertEquals(1, buf.size());
+        assertFalse(buf.undo());
+    }
 }

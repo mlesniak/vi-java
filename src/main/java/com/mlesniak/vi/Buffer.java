@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /** Text model: a list of lines plus file name and dirty flag. Never has zero lines. */
@@ -12,6 +14,7 @@ public class Buffer {
     private List<String> lines;
     private String name;
     private boolean dirty;
+    private final Deque<List<String>> undo = new ArrayDeque<>();
 
     public Buffer() {
         this(List.of(""));
@@ -99,5 +102,18 @@ public class Buffer {
         }
         dirty = true;
         return s;
+    }
+
+    public void snapshot() {
+        undo.push(new ArrayList<>(lines));
+    }
+
+    public boolean undo() {
+        if (undo.isEmpty()) {
+            return false;
+        }
+        lines = undo.pop();
+        dirty = true;
+        return true;
     }
 }
