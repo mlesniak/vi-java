@@ -34,6 +34,21 @@ public class Terminal {
         }
     }
 
+    /** Returns {rows, cols}; falls back to 24x80 if stty is unavailable or reports 0x0. */
+    public int[] size() {
+        try {
+            String[] parts = stty("size").trim().split(" ");
+            int rows = Integer.parseInt(parts[0]);
+            int cols = Integer.parseInt(parts[1]);
+            if (rows <= 0 || cols <= 0) {
+                return new int[] {24, 80};
+            }
+            return new int[] {rows, cols};
+        } catch (IOException | RuntimeException e) {
+            return new int[] {24, 80};
+        }
+    }
+
     public void write(String s) {
         System.out.print(s);
         System.out.flush();
