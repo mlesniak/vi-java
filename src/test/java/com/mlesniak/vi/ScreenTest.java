@@ -77,6 +77,18 @@ class ScreenTest {
     }
 
     @Test
+    void commandModeShowsCommandLineAndPutsCursorThere() {
+        Editor e = editor("a");
+        for (char c : ":wq".toCharArray()) {
+            e.handleKey(c);
+        }
+        String frame = Screen.render(e);
+        String[] rows = rows(frame);
+        assertTrue(rows[3].startsWith(":wq" + ESC + "[K"), rows[3]);
+        assertTrue(frame.endsWith(ESC + "[4;4H" + ESC + "[?25h"), frame);
+    }
+
+    @Test
     void cursorPositionIsOneBasedAndScrollAware() {
         Editor e = editor("1", "2", "3", "4", "5");
         assertTrue(Screen.render(e).endsWith(ESC + "[1;1H" + ESC + "[?25h"));

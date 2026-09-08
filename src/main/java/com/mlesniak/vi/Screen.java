@@ -19,14 +19,24 @@ public final class Screen {
         String bottom = bottomLine(e);
         sb.append(bottom, 0, Math.min(bottom.length(), e.cols() - 1));
         sb.append(CSI).append('K');
-        int cy = e.row() - e.scroll() + 1;
-        int cx = Math.min(e.col(), e.cols() - 1) + 1;
+        int cy;
+        int cx;
+        if (e.mode() == Editor.Mode.COMMAND) {
+            cy = e.rows();
+            cx = e.cmd().length() + 2;
+        } else {
+            cy = e.row() - e.scroll() + 1;
+            cx = Math.min(e.col(), e.cols() - 1) + 1;
+        }
         sb.append(CSI).append(cy).append(';').append(cx).append('H');
         sb.append(CSI).append("?25h");
         return sb.toString();
     }
 
     private static String bottomLine(Editor e) {
+        if (e.mode() == Editor.Mode.COMMAND) {
+            return ":" + e.cmd();
+        }
         if (!e.status().isEmpty()) {
             return e.status();
         }
