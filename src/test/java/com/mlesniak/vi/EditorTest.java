@@ -33,4 +33,56 @@ class EditorTest {
         assertEquals(5, e.rows());
         assertEquals(20, e.cols());
     }
+
+    @Test
+    void hjklMoveCursor() {
+        Editor e = editor("abc", "def");
+        type(e, "l");
+        assertCursor(e, 0, 1);
+        type(e, "j");
+        assertCursor(e, 1, 1);
+        type(e, "h");
+        assertCursor(e, 1, 0);
+        type(e, "k");
+        assertCursor(e, 0, 0);
+    }
+
+    @Test
+    void arrowKeysMoveCursor() {
+        Editor e = editor("abc", "def");
+        e.handleKey(Terminal.RIGHT);
+        assertCursor(e, 0, 1);
+        e.handleKey(Terminal.DOWN);
+        assertCursor(e, 1, 1);
+        e.handleKey(Terminal.LEFT);
+        assertCursor(e, 1, 0);
+        e.handleKey(Terminal.UP);
+        assertCursor(e, 0, 0);
+    }
+
+    @Test
+    void movementIsClampedToBuffer() {
+        Editor e = editor("ab", "c");
+        type(e, "hk");
+        assertCursor(e, 0, 0);
+        type(e, "lll");
+        assertCursor(e, 0, 1);
+        type(e, "jj");
+        assertCursor(e, 1, 0);
+    }
+
+    @Test
+    void emptyLineKeepsColumnZero() {
+        Editor e = editor("");
+        type(e, "l$");
+        assertCursor(e, 0, 0);
+    }
+
+    @Test
+    void unknownKeysAreIgnored() {
+        Editor e = editor("abc");
+        type(e, "Z?");
+        assertCursor(e, 0, 0);
+        assertEquals(Editor.Mode.NORMAL, e.mode());
+    }
 }

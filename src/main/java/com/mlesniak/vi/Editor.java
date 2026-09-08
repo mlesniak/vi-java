@@ -28,6 +28,10 @@ public class Editor {
 
     private void normal(int key) {
         switch (key) {
+            case 'h', Terminal.LEFT -> col--;
+            case 'l', Terminal.RIGHT -> col++;
+            case 'j', Terminal.DOWN -> row++;
+            case 'k', Terminal.UP -> row--;
             default -> {
             }
         }
