@@ -10,6 +10,7 @@ public class Editor {
     private Mode mode = Mode.NORMAL;
     private int row;
     private int col;
+    private int scroll;
     private final int rows;
     private final int cols;
 
@@ -24,6 +25,7 @@ public class Editor {
             case NORMAL -> normal(key);
         }
         clampCursor();
+        adjustScroll();
     }
 
     private void normal(int key) {
@@ -47,6 +49,15 @@ public class Editor {
         col = Math.max(0, Math.min(col, max));
     }
 
+    private void adjustScroll() {
+        int textRows = rows - 1;
+        if (row < scroll) {
+            scroll = row;
+        } else if (row >= scroll + textRows) {
+            scroll = row - textRows + 1;
+        }
+    }
+
     public Mode mode() {
         return mode;
     }
@@ -57,6 +68,10 @@ public class Editor {
 
     public int col() {
         return col;
+    }
+
+    public int scroll() {
+        return scroll;
     }
 
     public int rows() {

@@ -103,4 +103,18 @@ class EditorTest {
         assertCursor(e, 0, 0);
         assertEquals(Editor.Mode.NORMAL, e.mode());
     }
+
+    @Test
+    void scrollFollowsCursorDownAndUp() {
+        Editor e = editor("1", "2", "3", "4", "5", "6");
+        assertEquals(0, e.scroll());
+        type(e, "jjj");
+        assertEquals(0, e.scroll());
+        type(e, "j");
+        assertEquals(1, e.scroll());
+        type(e, "j");
+        assertEquals(2, e.scroll());
+        type(e, "kkkkk");
+        assertEquals(0, e.scroll());
+    }
 }
